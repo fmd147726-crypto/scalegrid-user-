@@ -196,6 +196,7 @@ function renderPortfolio(section, serviceCategoryId = "") {
   const categoryRows = orderedEnabled(categories);
   const allProjects = orderedEnabled(siteContent.portfolio).filter(([,item]) =>
     (!item.categoryId || categories[item.categoryId]?.enabled !== false) &&
+    (!item.categoryId || serviceCategories[item.categoryId]?.enabled !== false) &&
     (!item.serviceCategoryId || serviceCategories[item.serviceCategoryId]?.enabled !== false)
   );
   const projects = serviceCategoryId
