@@ -14,7 +14,7 @@ python -m http.server 8000
 Open `http://localhost:8000`. Browser module imports and Firebase require an HTTP(S) origin.
 
 ## Deploy
-Upload the contents of this folder to the root of the `ScaleGrid-User-Site` repository and enable GitHub Pages from `main` / root. See `DEPLOYMENT-CHECKLIST.md` and `FIREBASE-SETUP.md`.
+Upload the contents of this folder to the root of the `scalegrid-user-` repository and enable GitHub Pages from `main` / root. See `DEPLOYMENT-CHECKLIST.md` and `FIREBASE-SETUP.md`.
 
 ## SEO limitation
 Page metadata is updated in the browser after Firebase content loads. GitHub Pages serves static HTML and does not server-render each Firebase-driven page. Search crawlers may not see the full dynamic page content. Use prerendering or a rendering service for stronger SEO. Set page canonical URLs in the Admin Panel where appropriate.
