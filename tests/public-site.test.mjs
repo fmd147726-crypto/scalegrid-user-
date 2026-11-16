@@ -7,7 +7,7 @@ const config = readFileSync(new URL("../firebase-config.js", import.meta.url), "
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 
 test("public HTML metadata contains real line breaks, not escaped text", () => {
-  assert.doesNotMatch(html, /\\\\n/);
+  assert.equal(html.includes("\\n"), false);
   assert.match(html, /<meta property="og:image"/);
   assert.match(html, /<link rel="canonical"/);
 });
