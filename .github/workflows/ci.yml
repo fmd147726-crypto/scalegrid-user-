@@ -1,0 +1,30 @@
+name: ScaleGrid checks
+
+on:
+  push:
+    branches:
+      - main
+      - scalegrid-audit-fixes
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run tests
+        run: npm test
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Validate Firebase package
+        run: npm run validate:firebase
