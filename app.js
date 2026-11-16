@@ -163,8 +163,8 @@ function renderHero(section) {
 }
 
 function renderServiceGrid(section, selectedCategoryId = "") {
-  const categoryRows = orderedEnabled(siteContent.serviceCategories);
   const categories = siteContent.serviceCategories || {};
+  const categoryRows = orderedEnabled(categories);
   const services = orderedEnabled(siteContent.services).filter(([,item]) =>
     (!selectedCategoryId || item.categoryId === selectedCategoryId) &&
     (!item.categoryId || categories[item.categoryId]?.enabled !== false)
@@ -194,7 +194,10 @@ function renderPortfolio(section, serviceCategoryId = "") {
   const categories = siteContent.portfolioCategories || {};
   const serviceCategories = siteContent.serviceCategories || {};
   const categoryRows = orderedEnabled(categories);
-  const allProjects = orderedEnabled(siteContent.portfolio).filter(([,item]) => !item.categoryId || categories[item.categoryId]);
+  const allProjects = orderedEnabled(siteContent.portfolio).filter(([,item]) =>
+    (!item.categoryId || categories[item.categoryId]?.enabled !== false) &&
+    (!item.serviceCategoryId || serviceCategories[item.serviceCategoryId]?.enabled !== false)
+  );
   const projects = serviceCategoryId
     ? allProjects.filter(([,item]) => (item.serviceCategoryId || (serviceCategories[item.categoryId] ? item.categoryId : "")) === serviceCategoryId)
     : allProjects;
@@ -214,19 +217,32 @@ function renderRichText(section) {
   return `<section class="section" id="${esc(section.anchor || "about")}"><div class="wrap rich-layout"><div><span class="section-kicker">${esc(section.kicker || "ABOUT SCALEGRID")}</span><h2>${esc(section.title || "")}</h2></div><div><p class="rich-lead">${esc(section.lead || "")}</p><p class="rich-body">${esc(section.body || "")}</p></div></div></section>`;
 }
 function renderFeatures(section, serviceCategoryId = "") {
-  const items = orderedEnabled(siteContent.features).filter(([,item]) => !serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId).map(([,item]) => item);
+  const serviceCategories = siteContent.serviceCategories || {};
+  const items = orderedEnabled(siteContent.features).filter(([,item]) =>
+    (!serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId) &&
+    (!item.serviceCategoryId || serviceCategories[item.serviceCategoryId]?.enabled !== false)
+  ).map(([,item]) => item);
   const cards = items.map((item,index) => `<article class="feature-card"><div class="card-index">${String(index+1).padStart(2,"0")}</div><div class="card-icon">${iconMarkup(item.icon)}</div><h3>${esc(item.title || "")}</h3><p>${esc(item.description || "")}</p></article>`).join("");
   return `<section class="section" id="${esc(section.anchor || "why-scalegrid")}"><div class="wrap">${sectionHeading(section)}<div class="feature-grid">${cards || emptyMessage("Add your reasons and value points in the Why choose us area of the Admin Panel.")}</div></div></section>`;
 }
 function renderProcess(section, serviceCategoryId = "") {
-  const items = orderedEnabled(siteContent.process).filter(([,item]) => !serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId);
+  const serviceCategories = siteContent.serviceCategories || {};
+  const items = orderedEnabled(siteContent.process).filter(([,item]) =>
+    (!serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId) &&
+    (!item.serviceCategoryId || serviceCategories[item.serviceCategoryId]?.enabled !== false)
+  );
   const cards = items.map(([key,item],index) => `<article class="process-item">${item.icon ? `<span class="process-icon">${iconMarkup(item.icon)}</span>` : ""}<span class="process-number">STEP ${String(index+1).padStart(2,"0")}</span><h3>${esc(item.title || "")}</h3><p>${esc(item.description || "")}</p></article>`).join("");
   return `<section class="section" id="${esc(section.anchor || "process")}"><div class="wrap">${sectionHeading(section)}<div class="process-list">${cards || emptyMessage("Add your project steps in the Admin Panel.")}</div></div></section>`;
 }
 
 function renderFaq(section, serviceCategoryId = "") {
-  const faqs = orderedEnabled(siteContent.faqs).filter(([,item]) => !serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId);
   const categories = siteContent.faqCategories || {};
+  const serviceCategories = siteContent.serviceCategories || {};
+  const faqs = orderedEnabled(siteContent.faqs).filter(([,item]) =>
+    (!serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId) &&
+    (!item.categoryId || categories[item.categoryId]?.enabled !== false) &&
+    (!item.serviceCategoryId || serviceCategories[item.serviceCategoryId]?.enabled !== false)
+  );
   const grouped = new Map();
   faqs.forEach(([,item]) => {
     const categoryId = item.categoryId || "";
@@ -285,7 +301,7 @@ function renderSectionList(slug, sections) {
 function renderAboutPage() {
   const main = $("site-main");
   const savedAbout = siteContent.pages?.about;
-  if (savedAbout && savedAbout.enabled !== false) {
+  if (savedAbout) {
     const sections = orderedEnabled(savedAbout.sections);
     main.innerHTML = `<div class="custom-page-content">${renderSectionList("about",sections)}</div>`;
     updatePageMetadata(text(savedAbout.seoTitle) || `About — ${text(siteContent.settings?.brandName,"ScaleGrid")}`,text(savedAbout.metaDescription || savedAbout.description || siteContent.settings?.seoDescription),savedAbout.ogImage);
@@ -297,7 +313,7 @@ function renderAboutPage() {
   updatePageMetadata(`About — ${text(siteContent.settings?.brandName,"ScaleGrid")}`,text(siteContent.settings?.siteDescription || siteContent.settings?.seoDescription));
 }
 function resolveServiceCategory(value) {
-  return Object.entries(siteContent.serviceCategories || {}).find(([id,item]) => id === value || text(item?.slug) === value) || null;
+  return Object.entries(siteContent.serviceCategories || {}).find(([id,item]) => item && item.enabled !== false && (id === value || text(item.slug) === value)) || null;
 }
 function currentServiceCategory() {
   const segments = currentPathSegments();
@@ -337,7 +353,7 @@ function renderPage(slug) {
   const page = pages[slug];
   const main = $("site-main");
   if (slug === "about") { renderAboutPage(); return; }
-  if (!page || page.enabled === false) {
+  if (!page || (slug !== "home" && page.enabled === false)) {
     if (slug === "home" && !page) {
       main.innerHTML = `<section class="page-empty wrap"><span class="section-kicker">SCALEGRID</span><h1>This website is being prepared.</h1><p>Website content will appear here after the ScaleGrid owner publishes it from the Admin Panel.</p></section>`;
       updatePageMetadata(`${text(siteContent.settings?.brandName,"ScaleGrid")} — Digital Solutions`,text(siteContent.settings?.siteDescription));
@@ -347,7 +363,7 @@ function renderPage(slug) {
     updatePageMetadata(`${text(siteContent.settings?.brandName,"ScaleGrid")} — Page not found`,text(siteContent.settings?.seoDescription));
     return;
   }
-  let sections = orderedEnabled(page.sections);
+  let sections = entries(page.sections).filter(([,section]) => section && (section.enabled !== false || (slug === "home" && section.type === "contact"))).sort((a,b)=>(Number(a[1].order)||0)-(Number(b[1].order)||0));
   if (slug === "home") {
     // Keep the homepage focused: introduction, service discovery and a direct contact path.
     sections = sections.filter(([,section]) => ["hero","serviceGrid","contact"].includes(section.type));
