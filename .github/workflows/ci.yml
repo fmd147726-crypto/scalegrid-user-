@@ -29,7 +29,7 @@ jobs:
       - name: Validate Firebase package
         run: npm run validate:firebase
       - name: Package repository ZIP
-        run: zip -r scalegrid-user-site.zip . -x ".git/*" "node_modules/*" ".github/*" "scalegrid-user-site.zip"
+        run: zip -r /tmp/scalegrid-user-site.zip . -x ".git/*" "node_modules/*" ".github/*" && cp /tmp/scalegrid-user-site.zip scalegrid-user-site.zip
       - name: Upload project ZIP
         uses: actions/upload-artifact@v4
         with:
