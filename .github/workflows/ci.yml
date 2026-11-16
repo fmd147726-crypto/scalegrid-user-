@@ -28,3 +28,12 @@ jobs:
         run: npm run check
       - name: Validate Firebase package
         run: npm run validate:firebase
+      - name: Package repository ZIP
+        run: zip -r scalegrid-user-site.zip . -x ".git/*" "node_modules/*" ".github/*"
+      - name: Upload project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: scalegrid-user-site
+          path: scalegrid-user-site.zip
+          if-no-files-found: error
+          retention-days: 14
