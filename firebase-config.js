@@ -12,7 +12,7 @@ export const firebaseConfig = {
 };
 
 // Change this if the public GitHub repository uses a different name/account.
-export const expectedSiteUrl = "https://fmd147726-crypto.github.io/ScaleGrid-User-Site/";
+export const expectedSiteUrl = "https://fmd147726-crypto.github.io/scalegrid-user-/";
 
 // Optional reCAPTCHA v3 site key. Leave blank until App Check is registered in Firebase Console.
 export const appCheckSiteKey = "";
