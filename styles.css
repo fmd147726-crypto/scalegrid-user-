@@ -14,3 +14,27 @@
 .portfolio-card[hidden],.service-card[hidden]{display:none}
 
 .service-details,.project-details{color:var(--muted,#9aa69d);font-size:.92em;line-height:1.65}
+
+
+/* Announcement modal replaces the former compact top banner. */
+.announcement-overlay[hidden]{display:none}
+.announcement-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:24px;background:rgba(2,5,3,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:1;animation:announcement-fade-in .22s ease-out}
+.announcement-dialog{position:relative;width:min(100%,560px);max-height:min(86vh,760px);overflow:auto;border:1px solid rgba(189,255,69,.28);border-radius:24px;background:radial-gradient(ellipse at 100% 0,rgba(189,255,69,.13),transparent 42%),linear-gradient(145deg,#121b12,#090e09 72%);box-shadow:0 30px 100px rgba(0,0,0,.6),0 0 55px rgba(189,255,69,.08);outline:none;animation:announcement-pop-in .28s cubic-bezier(.2,.8,.2,1)}
+.announcement-close{position:absolute;top:17px;right:17px;z-index:2;width:38px;height:38px;border:1px solid rgba(255,255,255,.13);border-radius:50%;background:rgba(5,9,5,.65);color:#eaf1e6;font-size:25px;line-height:1;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.announcement-close:hover{background:rgba(189,255,69,.13);border-color:rgba(189,255,69,.5);transform:rotate(90deg)}
+.announcement-eyebrow{display:flex;align-items:center;gap:10px;padding:27px 72px 17px 30px;color:var(--lime);font-size:10px;font-weight:700;letter-spacing:2px}
+.announcement-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px var(--lime)}
+.announcement-image{display:block;width:calc(100% - 60px);max-height:230px;object-fit:cover;margin:0 30px 23px;border:1px solid rgba(189,255,69,.17);border-radius:15px;background:#0b100b}
+.announcement-image[hidden]{display:none}
+.announcement-content{padding:10px 30px 30px}
+.announcement-content h2{margin:0 0 14px;color:#f2f6ed;font:700 clamp(27px,5vw,38px)/1.13 var(--display);letter-spacing:-1.1px;overflow-wrap:anywhere}
+.announcement-content p{margin:0;color:#b4c0b1;font-size:15px;line-height:1.85;white-space:pre-line;overflow-wrap:anywhere}
+.announcement-action{display:inline-flex;align-items:center;gap:10px;margin-top:24px;padding:12px 19px;border-radius:999px;background:var(--lime);color:#10160b;font-size:12px;font-weight:700;transition:transform .2s,box-shadow .2s}
+.announcement-action:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(189,255,69,.18)}
+.announcement-action[hidden]{display:none}
+.announcement-footer{padding:15px 30px;border-top:1px solid rgba(255,255,255,.07);color:#778474;font-size:10px;letter-spacing:.5px}
+body.announcement-open{overflow:hidden}
+@keyframes announcement-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes announcement-pop-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:600px){.announcement-overlay{padding:16px}.announcement-dialog{border-radius:20px;max-height:88vh}.announcement-eyebrow{padding:23px 62px 14px 22px;font-size:9px}.announcement-close{top:12px;right:12px;width:35px;height:35px}.announcement-image{width:calc(100% - 44px);max-height:190px;margin:0 22px 18px}.announcement-content{padding:8px 22px 24px}.announcement-content h2{font-size:28px}.announcement-content p{font-size:14px}.announcement-footer{padding:13px 22px}}
+@media(prefers-reduced-motion:reduce){.announcement-overlay,.announcement-dialog{animation:none}}
