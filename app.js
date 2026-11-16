@@ -16,18 +16,27 @@ let announcementTimer = null;
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const entries = (value) => value && typeof value === "object" ? Object.entries(value).sort((a,b) => (Number(a[1]?.order) || 0) - (Number(b[1]?.order) || 0)) : [];
 const text = (value, fallback = "") => String(value ?? fallback).trim();
+const siteRootUrl = new URL(expectedSiteUrl);
+const siteRootPath = siteRootUrl.pathname.replace(/\/$/, "");
+const siteAnchorHref = (anchor = "home") => `${expectedSiteUrl}#${anchor}`;
+const sitePageHref = (slug) => new URL(`pages/${encodeURIComponent(slug)}/`, expectedSiteUrl).href;
+function currentPathSegments() {
+  let pathname = location.pathname;
+  if (siteRootPath && pathname.startsWith(siteRootPath)) pathname = pathname.slice(siteRootPath.length);
+  return pathname.split("/").filter(Boolean).map(part => { try { return decodeURIComponent(part); } catch { return part; } });
+}
 function safeHref(value, fallback = "#") {
   const raw = text(value, fallback);
   if (raw.startsWith("#")) return raw;
   try {
-    const url = new URL(raw, location.href);
+    const url = new URL(raw, expectedSiteUrl);
     return ["https:", "http:", "mailto:", "tel:"].includes(url.protocol) ? url.href : fallback;
   } catch { return fallback; }
 }
 function safeImage(value) {
   const raw = text(value);
   if (!raw) return "";
-  try { const url = new URL(raw, location.href); return url.protocol === "https:" ? url.href : ""; }
+  try { const url = new URL(raw, expectedSiteUrl); return url.protocol === "https:" ? url.href : ""; }
   catch { return ""; }
 }
 function showToast(message) {
@@ -53,25 +62,26 @@ function highlightHeadline(value) {
 
 function serviceCategoryHref(id, category = {}) {
   const slug = text(category.slug) || id;
-  return `#service/${encodeURIComponent(slug)}`;
+  return new URL(`services/${encodeURIComponent(slug)}/`, expectedSiteUrl).href;
 }
 function renderNav() {
   const nav = $("site-nav");
   const footerNav = $("footer-nav");
   const categories = orderedEnabled(siteContent.serviceCategories);
-  const otherPages = orderedEnabled(siteContent.pages).filter(([id,page]) => id !== "home" && id !== "about" && page?.enabled !== false);
+  const otherPages = orderedEnabled(siteContent.pages).filter(([id,page]) => !["home","about"].includes(id) && page?.enabled !== false);
   const serviceMenu = categories.length
     ? `<details class="nav-dropdown"><summary>Services <span aria-hidden="true">⌄</span></summary><div class="nav-dropdown-menu">${categories.map(([id,item]) => `<a href="${esc(serviceCategoryHref(id,item))}">${esc(item.name || id)}</a>`).join("")}</div></details>`
-    : `<a href="#services">Services</a>`;
+    : `<a href="${esc(siteAnchorHref("services"))}">Services</a>`;
   const pagesMenu = otherPages.length
-    ? `<details class="nav-dropdown"><summary>Pages <span aria-hidden="true">⌄</span></summary><div class="nav-dropdown-menu">${otherPages.map(([id,page]) => `<a href="#page/${encodeURIComponent(page.slug || id)}">${esc(page.title || id)}</a>`).join("")}</div></details>`
+    ? `<details class="nav-dropdown"><summary>More <span aria-hidden="true">⌄</span></summary><div class="nav-dropdown-menu">${otherPages.map(([id,page]) => `<a href="${esc(sitePageHref(page.slug || id))}">${esc(page.title || id)}</a>`).join("")}</div></details>`
     : "";
-  if (nav) nav.innerHTML = `<a href="#home">Home</a>${serviceMenu}<a href="#page/about">About</a>${pagesMenu}<a href="#contact">Contact</a>`;
+  if (nav) nav.innerHTML = `<a href="${esc(siteAnchorHref("home"))}">Home</a>${serviceMenu}<a href="${esc(sitePageHref("about"))}">About</a>${pagesMenu}<a href="${esc(siteAnchorHref("contact"))}">Contact</a>`;
   if (footerNav) footerNav.innerHTML = [
-    `<a href="#home">Home</a>`,
-    ...categories.slice(0,5).map(([id,item])=>`<a href="${esc(serviceCategoryHref(id,item))}">${esc(item.name || id)}</a>`),
-    `<a href="#page/about">About</a>`,
-    `<a href="#contact">Contact</a>`
+    `<a href="${esc(siteAnchorHref("home"))}">Home</a>`,
+    ...categories.slice(0,6).map(([id,item])=>`<a href="${esc(serviceCategoryHref(id,item))}">${esc(item.name || id)}</a>`),
+    `<a href="${esc(sitePageHref("about"))}">About</a>`,
+    ...otherPages.slice(0,4).map(([id,page])=>`<a href="${esc(sitePageHref(page.slug || id))}">${esc(page.title || id)}</a>`),
+    `<a href="${esc(siteAnchorHref("contact"))}">Contact</a>`
   ].join("");
 }
 
@@ -101,7 +111,7 @@ function renderHeaderAndFooter() {
     headerCta.rel = "noopener noreferrer";
     headerCta.innerHTML = `Let's talk <span>↗</span>`;
   } else {
-    headerCta.href = "#contact";
+    headerCta.href = siteAnchorHref("contact");
     headerCta.removeAttribute("target");
   }
   renderNav();
@@ -279,17 +289,20 @@ function resolveServiceCategory(value) {
   return Object.entries(siteContent.serviceCategories || {}).find(([id,item]) => id === value || text(item?.slug) === value) || null;
 }
 function currentServiceCategory() {
+  const segments = currentPathSegments();
+  if (segments[0] === "services" && segments[1]) return resolveServiceCategory(segments[1]);
   const hash = location.hash || "";
   if (!hash.startsWith("#service/")) return null;
   const requested = decodeURIComponent(hash.slice(9)).split("/")[0];
   return resolveServiceCategory(requested);
 }
+
 function renderServiceCategoryPage(categoryId, category) {
   const main = $("site-main");
   const name = text(category.name,"Services");
   const description = text(category.description,"Explore how ScaleGrid can help in this area.");
   const icon = iconMarkup(category.icon || "✳");
-  const hero = `<section class="service-page-hero"><div class="wrap"><a class="back-link" href="#home">← Back to home</a><div class="service-page-mark">${icon}</div><span class="section-kicker">SCALEGRID SERVICES</span><h1>${esc(name)}</h1><p>${esc(description)}</p><div class="hero-actions"><a class="button-primary" href="#contact">Discuss this service <span>↗</span></a><a class="button-secondary" href="#category-work">Explore relevant work</a></div></div></section>`;
+  const hero = `<section class="service-page-hero"><div class="wrap"><a class="back-link" href="${esc(siteAnchorHref("home"))}">← Back to home</a><div class="service-page-mark">${icon}</div><span class="section-kicker">SCALEGRID SERVICES</span><h1>${esc(name)}</h1><p>${esc(description)}</p><div class="hero-actions"><a class="button-primary" href="#contact">Discuss this service <span>↗</span></a><a class="button-secondary" href="#category-work">Explore relevant work</a></div></div></section>`;
   const homeSections = orderedEnabled(siteContent.pages?.home?.sections);
   const processSection = homeSections.find(([,section]) => section.type === "processList")?.[1];
   const featureSection = homeSections.find(([,section]) => section.type === "featureGrid")?.[1];
@@ -316,7 +329,7 @@ function renderPage(slug) {
       updatePageMetadata(`${text(siteContent.settings?.brandName,"ScaleGrid")} — Digital Solutions`,text(siteContent.settings?.siteDescription));
       return;
     }
-    main.innerHTML = `<section class="page-empty wrap"><span class="section-kicker">PAGE NOT AVAILABLE</span><h1>This page isn't available.</h1><p>It may have been unpublished or the address may have changed.</p><a class="button-secondary" href="#home">Back to home</a></section>`;
+    main.innerHTML = `<section class="page-empty wrap"><span class="section-kicker">PAGE NOT AVAILABLE</span><h1>This page isn't available.</h1><p>It may have been unpublished or the address may have changed.</p><a class="button-secondary" href="${esc(siteAnchorHref("home"))}">Back to home</a></section>`;
     updatePageMetadata(`${text(siteContent.settings?.brandName,"ScaleGrid")} — Page not found`,text(siteContent.settings?.seoDescription));
     return;
   }
@@ -334,6 +347,13 @@ function renderPage(slug) {
   updatePageMetadata(text(page.seoTitle) || (slug === "home" && text(siteContent.settings?.siteTitle) ? text(siteContent.settings.siteTitle) : `${text(page.title,slug)} — ${text(siteContent.settings?.brandName,"ScaleGrid")}`),text(page.metaDescription || siteContent.settings?.seoDescription || siteContent.settings?.siteDescription),page.ogImage || siteContent.settings?.ogImage);
 }
 function currentPageSlug() {
+  const segments = currentPathSegments();
+  if (segments[0] === "pages" && segments[1]) {
+    const requested = segments[1];
+    const match = Object.entries(siteContent.pages || {}).find(([id,page]) => id === requested || page?.slug === requested);
+    return match ? match[0] : requested;
+  }
+  if (segments[0] === "services" && segments[1]) return "__not_found__";
   const hash = location.hash || "#home";
   if (hash.startsWith("#page/")) {
     const requested = decodeURIComponent(hash.slice(6)).split("/")[0];
@@ -342,6 +362,7 @@ function currentPageSlug() {
   }
   return "home";
 }
+
 function render() {
   if (!connected) return;
   renderHeaderAndFooter();
@@ -383,7 +404,7 @@ function renderNotification() {
     const startsAt = Number(item.startsAt)||0;
     const endsAt = Number(item.endsAt)||0;
     const inTimeWindow = (!startsAt || startsAt <= now) && (!endsAt || endsAt >= now);
-    const targetsCategory = item.serviceCategoryId ? item.serviceCategoryId === categoryId : !categoryId || !item.serviceCategoryId;
+    const targetsCategory = !item.serviceCategoryId || item.serviceCategoryId === categoryId
     return inTimeWindow && targetsCategory;
   }).sort((a,b) => {
     const aSpecific = a[1].serviceCategoryId ? 1 : 0;
@@ -481,6 +502,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeAnnouncement();
 });
 window.addEventListener("hashchange", render);
+window.addEventListener("popstate", render);
 
 onValue(ref(db, "publicContent"), (snapshot) => {
   siteContent = snapshot.exists() ? snapshot.val() : {};
