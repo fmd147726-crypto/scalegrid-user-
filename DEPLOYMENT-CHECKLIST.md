@@ -1,11 +1,11 @@
 # Deployment checklist
 
 ## Repositories
-- User: `ScaleGrid-User-Site`
+- User: `scalegrid-user-`
 - Admin: `ScaleGrid-Admin-Panel`
 
 Expected GitHub Pages URLs:
-- `https://fmd147726-crypto.github.io/ScaleGrid-User-Site/`
+- `https://fmd147726-crypto.github.io/scalegrid-user-/`
 - `https://fmd147726-crypto.github.io/ScaleGrid-Admin-Panel/`
 
 ## Publish
