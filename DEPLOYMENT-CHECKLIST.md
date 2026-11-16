@@ -6,7 +6,7 @@
 
 Expected GitHub Pages URLs:
 - `https://fmd147726-crypto.github.io/scalegrid-user-/`
-- `https://fmd147726-crypto.github.io/ScaleGrid-Admin-Panel/`
+- `https://fmd147726-crypto.github.io/1.-scalegrid-admin-/`
 
 ## Publish
 1. Create/retain each repository with the exact name above.
