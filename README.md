@@ -1,0 +1,26 @@
+# ScaleGrid Public Website
+
+A responsive public website for ScaleGrid, designed for GitHub Pages and powered by the existing Firebase Realtime Database project `scalegrid-1c506`.
+
+## Content source
+The public site reads **only** `publicContent`. The repository includes the same Realtime Database rules and Firebase CLI project configuration as the Admin Panel; deploy the rules from one repository only after the Super Admin bootstrap is verified. It does not read private `siteContent` working records. The Admin Panel publishes a filtered projection that excludes drafts, archived/hidden records, disabled categories, unpublished pages, and unpublished sections.
+
+The site supports dynamic navigation, custom hash-routed pages, page-specific metadata, reusable hero/services/portfolio/about/features/process/FAQ/contact/announcement sections, independent category filters, FAQ category groups, social links, WhatsApp contact, and legacy notifications.
+
+## Run locally
+```bash
+python -m http.server 8000
+```
+Open `http://localhost:8000`. Browser module imports and Firebase require an HTTP(S) origin.
+
+## Deploy
+Upload the contents of this folder to the root of the `ScaleGrid-User-Site` repository and enable GitHub Pages from `main` / root. See `DEPLOYMENT-CHECKLIST.md` and `FIREBASE-SETUP.md`.
+
+## SEO limitation
+Page metadata is updated in the browser after Firebase content loads. GitHub Pages serves static HTML and does not server-render each Firebase-driven page. Search crawlers may not see the full dynamic page content. Use prerendering or a rendering service for stronger SEO. Set page canonical URLs in the Admin Panel where appropriate.
+
+## Data compatibility
+Legacy `pages`, `categories`, and `notifications` paths are preserved. The public site uses the new `publicContent` projection for website content and reads the existing `notifications` stream separately.
+
+## Documentation
+See the Firebase setup, database schema, migration, security, deployment, testing, and release-readiness guides in this repository.

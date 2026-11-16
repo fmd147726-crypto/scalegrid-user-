@@ -1,0 +1,11 @@
+{
+  "name": "scalegrid-user-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check app.js",
+    "validate:firebase": "node scripts/validate-firebase-package.mjs",
+    "deploy:rules": "firebase deploy --only database"
+  }
+}

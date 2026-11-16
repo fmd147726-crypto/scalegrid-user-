@@ -1,0 +1,118 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "adminUids": {
+      ".read": false,
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && data.val() === true",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && root.child('admins').child(auth.uid).child('role').val() === 'super'",
+        ".validate": "newData.isBoolean()"
+      }
+    },
+    "admins": {
+      ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && root.child('admins').child(auth.uid).child('role').val() === 'super'",
+      "$uid": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (auth.uid === $uid || root.child('admins').child(auth.uid).child('role').val() === 'super')",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && root.child('admins').child(auth.uid).child('role').val() === 'super'"
+      }
+    },
+    "siteContent": {
+      "settings": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('settings').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('settings').val() === true)"
+      },
+      "navigation": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('navigation').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('navigation').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "serviceCategories": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('serviceCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('serviceCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "services": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('serviceCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('serviceCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "portfolioCategories": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('portfolioCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('portfolioCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "portfolio": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('portfolioCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('portfolioCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "faqCategories": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('faqCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('faqs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('FAQs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('faqCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('faqs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('FAQs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "faqs": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('faqs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('FAQs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('faqCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('faqs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('FAQs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('faqCategories').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "process": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('process').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('process').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "features": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('features').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('features').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "socialLinks": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('socialLinks').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('socialLinks').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "media": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('media').val() === true || root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('media').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+      },
+      "pages": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('pages').val() === true || root.child('admins').child(auth.uid).child('permissions').child('sections').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+        "$pageId": {
+          ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('pages').val() === true || root.child('admins').child(auth.uid).child('permissions').child('sections').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+          "$field": {
+            ".write": "auth != null && $field !== 'sections' && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('pages').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+          },
+          "sections": {
+            ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('pages').val() === true || root.child('admins').child(auth.uid).child('permissions').child('sections').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)",
+            ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('sections').val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true)"
+          }
+        }
+      }
+    },
+    "publicContent": {
+      ".read": true,
+      ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('publishing').val() === true)"
+    },
+    "notifications": {
+      ".read": true,
+      ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child('notifications').val() === true)"
+    },
+    "pages": {
+      ".read": true,
+      ".write": false
+    },
+    "categories": {
+      ".read": true,
+      ".write": false
+    },
+    "adminActivity": {
+      ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && root.child('admins').child(auth.uid).child('role').val() === 'super'",
+      "$entry": {
+        ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && !data.exists() && newData.child('uid').val() === auth.uid",
+        ".validate": "newData.hasChildren(['uid','action','contentType','contentId','timestamp'])"
+      }
+    },
+    "siteContentHistory": {
+      "$collection": {
+        ".read": "auth != null && root.child('adminUids').child(auth.uid).val() === true && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child($collection).val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || ($collection === 'portfolioCategories' && (root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true)) || ($collection === 'faqCategories' && (root.child('admins').child(auth.uid).child('permissions').child('faqs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('FAQs').val() === true)) || ($collection === 'serviceCategories' && (root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Pricing').val() === true)) || ($collection === 'sections' && root.child('admins').child(auth.uid).child('permissions').child('sections').val() === true))",
+        "$id": {
+          "$version": {
+            ".write": "auth != null && root.child('adminUids').child(auth.uid).val() === true && !data.exists() && newData.child('uid').val() === auth.uid && (root.child('admins').child(auth.uid).child('role').val() === 'super' || root.child('admins').child(auth.uid).child('permissions').child($collection).val() === true || root.child('admins').child(auth.uid).child('permissions').child('content').val() === true || ($collection === 'portfolioCategories' && (root.child('admins').child(auth.uid).child('permissions').child('portfolio').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Portfolio').val() === true)) || ($collection === 'faqCategories' && (root.child('admins').child(auth.uid).child('permissions').child('faqs').val() === true || root.child('admins').child(auth.uid).child('permissions').child('FAQs').val() === true)) || ($collection === 'serviceCategories' && (root.child('admins').child(auth.uid).child('permissions').child('services').val() === true || root.child('admins').child(auth.uid).child('permissions').child('pricing').val() === true || root.child('admins').child(auth.uid).child('permissions').child('Pricing').val() === true)) || ($collection === 'sections' && root.child('admins').child(auth.uid).child('permissions').child('sections').val() === true))",
+            ".validate": "newData.hasChildren(['record','uid','timestamp'])"
+          }
+        }
+      }
+    }
+  }
+}

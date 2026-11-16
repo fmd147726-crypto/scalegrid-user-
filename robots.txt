@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://fmd147726-crypto.github.io/ScaleGrid-User-Site/sitemap.xml
