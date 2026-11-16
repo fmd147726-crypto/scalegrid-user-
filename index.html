@@ -19,8 +19,18 @@
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
-  <div id="announcement" class="announcement" hidden>
-    <div class="announcement-inner"><span class="announcement-dot"></span><span id="announcement-text"></span><a id="announcement-link" hidden target="_blank" rel="noopener noreferrer">Learn more ↗</a><img id="announcement-image" alt="" hidden><button id="announcement-close" class="icon-button" aria-label="Dismiss announcement">×</button></div>
+  <div id="announcement" class="announcement-overlay" hidden aria-hidden="true">
+    <section class="announcement-dialog" role="dialog" aria-modal="true" aria-labelledby="announcement-title" aria-describedby="announcement-message" tabindex="-1">
+      <button id="announcement-close" class="announcement-close" type="button" aria-label="Close announcement">×</button>
+      <div class="announcement-eyebrow"><span class="announcement-dot"></span> SCALEGRID UPDATE</div>
+      <img id="announcement-image" class="announcement-image" alt="" hidden>
+      <div class="announcement-content">
+        <h2 id="announcement-title"></h2>
+        <p id="announcement-message"></p>
+        <a id="announcement-link" class="announcement-action" hidden target="_blank" rel="noopener noreferrer">Learn more <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="announcement-footer">A message from ScaleGrid</div>
+    </section>
   </div>
 
   <header class="site-header">
