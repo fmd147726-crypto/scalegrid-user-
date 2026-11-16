@@ -22,7 +22,7 @@ Expected GitHub Pages URLs:
 GitHub Pages serves static files. The public website loads Firebase content in the browser; search engines may not receive fully rendered dynamic page content from the initial HTML. Page metadata is updated client-side. For robust server-rendered SEO, prerender pages at build time or use a rendering service. Hash-based custom page URLs are not ideal canonical URLs; configure canonical URLs explicitly when needed.
 
 ## Not yet done
-No repository was pushed, no GitHub Pages deployment was performed, no Firebase rules were applied, and no live content was changed during this build.
+The fixes have been merged into both repositories' `main` branches. GitHub Pages deployment and live Firebase changes have not yet been performed.
 
 
 ## Realtime Database rules deployment
