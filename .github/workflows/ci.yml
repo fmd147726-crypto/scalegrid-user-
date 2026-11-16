@@ -1,0 +1,39 @@
+name: ScaleGrid checks
+
+on:
+  push:
+    branches:
+      - main
+      - scalegrid-final-fixes
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run tests
+        run: npm test
+      - name: Check JavaScript syntax
+        run: npm run check
+      - name: Validate Firebase package
+        run: npm run validate:firebase
+      - name: Package repository ZIP
+        run: zip -r /tmp/scalegrid-user-site.zip . -x ".git/*" "node_modules/*" ".github/*" && cp /tmp/scalegrid-user-site.zip scalegrid-user-site.zip
+      - name: Upload project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: scalegrid-user-site
+          path: scalegrid-user-site.zip
+          if-no-files-found: error
+          retention-days: 14
