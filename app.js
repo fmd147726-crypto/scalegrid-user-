@@ -64,21 +64,32 @@ function serviceCategoryHref(id, category = {}) {
   const slug = text(category.slug) || id;
   return new URL(`services/${encodeURIComponent(slug)}/`, expectedSiteUrl).href;
 }
+function categoryNavigationLabel(item, id) {
+  const custom = text(item.navigationLabel);
+  if (custom) return custom;
+  const name = text(item.name || id);
+  const defaults = {
+    "Websites & Web Apps":"Websites",
+    "Apps & Software":"Apps",
+    "Advertising & Campaigns":"Ads",
+    "Business Automation":"Automation",
+    "Custom Digital Solutions":"Custom"
+  };
+  return defaults[name] || name;
+}
 function renderNav() {
   const nav = $("site-nav");
   const footerNav = $("footer-nav");
   const categories = orderedEnabled(siteContent.serviceCategories);
   const otherPages = orderedEnabled(siteContent.pages).filter(([id,page]) => !["home","about"].includes(id) && page?.enabled !== false);
-  const serviceMenu = categories.length
-    ? `<details class="nav-dropdown"><summary>Services <span aria-hidden="true">⌄</span></summary><div class="nav-dropdown-menu">${categories.map(([id,item]) => `<a href="${esc(serviceCategoryHref(id,item))}">${esc(item.name || id)}</a>`).join("")}</div></details>`
-    : `<a href="${esc(siteAnchorHref("services"))}">Services</a>`;
+  const serviceLinks = categories.map(([id,item]) => `<a href="${esc(serviceCategoryHref(id,item))}" aria-label="${esc(item.name || id)}">${esc(categoryNavigationLabel(item,id))}</a>`).join("");
   const pagesMenu = otherPages.length
     ? `<details class="nav-dropdown"><summary>More <span aria-hidden="true">⌄</span></summary><div class="nav-dropdown-menu">${otherPages.map(([id,page]) => `<a href="${esc(sitePageHref(page.slug || id))}">${esc(page.title || id)}</a>`).join("")}</div></details>`
     : "";
-  if (nav) nav.innerHTML = `<a href="${esc(siteAnchorHref("home"))}">Home</a>${serviceMenu}<a href="${esc(sitePageHref("about"))}">About</a>${pagesMenu}<a href="${esc(siteAnchorHref("contact"))}">Contact</a>`;
+  if (nav) nav.innerHTML = `<a href="${esc(siteAnchorHref("home"))}">Home</a>${serviceLinks}<a href="${esc(sitePageHref("about"))}">About</a>${pagesMenu}<a href="${esc(siteAnchorHref("contact"))}">Contact</a>`;
   if (footerNav) footerNav.innerHTML = [
     `<a href="${esc(siteAnchorHref("home"))}">Home</a>`,
-    ...categories.slice(0,6).map(([id,item])=>`<a href="${esc(serviceCategoryHref(id,item))}">${esc(item.name || id)}</a>`),
+    ...categories.slice(0,8).map(([id,item])=>`<a href="${esc(serviceCategoryHref(id,item))}">${esc(item.name || id)}</a>`),
     `<a href="${esc(sitePageHref("about"))}">About</a>`,
     ...otherPages.slice(0,4).map(([id,page])=>`<a href="${esc(sitePageHref(page.slug || id))}">${esc(page.title || id)}</a>`),
     `<a href="${esc(siteAnchorHref("contact"))}">Contact</a>`
