@@ -267,19 +267,33 @@ function render() {
   }
 }
 function renderNotification() {
-  const rows = Object.values(notifications || {}).filter(Boolean);
-  if (!rows.length || sessionStorage.getItem("scalegridNoticeDismissed") === "1") return;
-  rows.sort((a,b) => (Number(a.createdAt) || 0) - (Number(b.createdAt) || 0));
-  const item = rows[rows.length - 1];
-  if (item.enabled === false || !item.title || !item.message) return;
-  $("announcement-text").textContent = `${item.title} — ${item.message}`;
+  const active = Object.entries(notifications || {})
+    .filter(([, item]) => item && item.enabled !== false && text(item.title) && text(item.message))
+    .sort((a,b) => (Number(a[1].createdAt) || 0) - (Number(b[1].createdAt) || 0));
+  const overlay = $("announcement");
+  if (!overlay || !active.length) return;
+  const [id, item] = active[active.length - 1];
+  // Show each announcement once per browser tab session; a newly published ID can still appear.
+  if (sessionStorage.getItem("scalegridNoticeDismissed") === id) return;
+  $("announcement-title").textContent = text(item.title);
+  $("announcement-message").textContent = text(item.message);
   const destination = safeHref(item.destinationUrl || "");
   const linkNode = $("announcement-link");
-  if (linkNode) { linkNode.href = destination; linkNode.hidden = !item.destinationUrl || destination === "#"; }
+  if (linkNode) {
+    linkNode.href = destination;
+    linkNode.hidden = !item.destinationUrl || destination === "#";
+  }
   const imageUrl = safeImage(item.bannerUrl || item.imageUrl);
-  const imageNode = $("announcement").querySelector("img");
-  if (imageNode) { imageNode.src = imageUrl || ""; imageNode.hidden = !imageUrl; }
-  $("announcement").hidden = false;
+  const imageNode = $("announcement-image");
+  if (imageNode) {
+    imageNode.src = imageUrl || "";
+    imageNode.hidden = !imageUrl;
+  }
+  overlay.dataset.notificationId = id;
+  overlay.hidden = false;
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("announcement-open");
+  requestAnimationFrame(() => overlay.querySelector(".announcement-dialog")?.focus());
 }
 
 $("site-main")?.addEventListener("click", (event) => {
@@ -327,9 +341,21 @@ $("site-nav")?.addEventListener("click", (event) => {
     $("menu-toggle").setAttribute("aria-expanded", "false");
   }
 });
-$("announcement-close")?.addEventListener("click", () => {
-  $("announcement").hidden = true;
-  sessionStorage.setItem("scalegridNoticeDismissed", "1");
+function closeAnnouncement() {
+  const overlay = $("announcement");
+  if (!overlay || overlay.hidden) return;
+  const id = overlay.dataset.notificationId;
+  if (id) sessionStorage.setItem("scalegridNoticeDismissed", id);
+  overlay.hidden = true;
+  overlay.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("announcement-open");
+}
+$("announcement-close")?.addEventListener("click", closeAnnouncement);
+$("announcement")?.addEventListener("click", (event) => {
+  if (event.target === $("announcement")) closeAnnouncement();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeAnnouncement();
 });
 window.addEventListener("hashchange", render);
 
