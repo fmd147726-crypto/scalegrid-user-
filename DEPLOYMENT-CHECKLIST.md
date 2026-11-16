@@ -2,7 +2,7 @@
 
 ## Repositories
 - User: `scalegrid-user-`
-- Admin: `ScaleGrid-Admin-Panel`
+- Admin: `1.-scalegrid-admin-`
 
 Expected GitHub Pages URLs:
 - `https://fmd147726-crypto.github.io/scalegrid-user-/`
