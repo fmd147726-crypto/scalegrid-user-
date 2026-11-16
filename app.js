@@ -202,13 +202,13 @@ function renderPortfolio(section, serviceCategoryId = "") {
 function renderRichText(section) {
   return `<section class="section" id="${esc(section.anchor || "about")}"><div class="wrap rich-layout"><div><span class="section-kicker">${esc(section.kicker || "ABOUT SCALEGRID")}</span><h2>${esc(section.title || "")}</h2></div><div><p class="rich-lead">${esc(section.lead || "")}</p><p class="rich-body">${esc(section.body || "")}</p></div></div></section>`;
 }
-function renderFeatures(section) {
-  const items = orderedEnabled(siteContent.features).map(([,item]) => item);
+function renderFeatures(section, serviceCategoryId = "") {
+  const items = orderedEnabled(siteContent.features).filter(([,item]) => !serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId).map(([,item]) => item);
   const cards = items.map((item,index) => `<article class="feature-card"><div class="card-index">${String(index+1).padStart(2,"0")}</div><div class="card-icon">${iconMarkup(item.icon)}</div><h3>${esc(item.title || "")}</h3><p>${esc(item.description || "")}</p></article>`).join("");
   return `<section class="section" id="${esc(section.anchor || "why-scalegrid")}"><div class="wrap">${sectionHeading(section)}<div class="feature-grid">${cards || emptyMessage("Add your reasons and value points in the Why choose us area of the Admin Panel.")}</div></div></section>`;
 }
-function renderProcess(section) {
-  const items = orderedEnabled(siteContent.process);
+function renderProcess(section, serviceCategoryId = "") {
+  const items = orderedEnabled(siteContent.process).filter(([,item]) => !serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId);
   const cards = items.map(([key,item],index) => `<article class="process-item">${item.icon ? `<span class="process-icon">${iconMarkup(item.icon)}</span>` : ""}<span class="process-number">STEP ${String(index+1).padStart(2,"0")}</span><h3>${esc(item.title || "")}</h3><p>${esc(item.description || "")}</p></article>`).join("");
   return `<section class="section" id="${esc(section.anchor || "process")}"><div class="wrap">${sectionHeading(section)}<div class="process-list">${cards || emptyMessage("Add your project steps in the Admin Panel.")}</div></div></section>`;
 }
@@ -300,17 +300,20 @@ function currentServiceCategory() {
 function renderServiceCategoryPage(categoryId, category) {
   const main = $("site-main");
   const name = text(category.name,"Services");
-  const description = text(category.description,"Explore how ScaleGrid can help in this area.");
+  const description = text(category.pageIntro || category.description,"Explore how ScaleGrid can help in this area.");
   const icon = iconMarkup(category.icon || "✳");
-  const hero = `<section class="service-page-hero"><div class="wrap"><a class="back-link" href="${esc(siteAnchorHref("home"))}">← Back to home</a><div class="service-page-mark">${icon}</div><span class="section-kicker">SCALEGRID SERVICES</span><h1>${esc(name)}</h1><p>${esc(description)}</p><div class="hero-actions"><a class="button-primary" href="#contact">Discuss this service <span>↗</span></a><a class="button-secondary" href="#category-work">Explore relevant work</a></div></div></section>`;
+  const hero = `<section class="service-page-hero"><div class="wrap"><a class="back-link" href="${esc(siteAnchorHref("home"))}">← Back to home</a><div class="service-page-mark">${icon}</div><span class="section-kicker">SCALEGRID SERVICES</span><h1>${esc(category.pageHeadline || name)}</h1><p>${esc(description)}</p><div class="hero-actions"><a class="button-primary" href="#contact">Discuss this service <span>↗</span></a><a class="button-secondary" href="#category-work">Explore relevant work</a></div></div></section>`;
   const homeSections = orderedEnabled(siteContent.pages?.home?.sections);
   const processSection = homeSections.find(([,section]) => section.type === "processList")?.[1];
   const featureSection = homeSections.find(([,section]) => section.type === "featureGrid")?.[1];
+  const benefits = Array.isArray(category.benefits) ? category.benefits : String(category.benefits || "").split("\n").filter(Boolean);
+  const detailSection = category.pageDetails ? `<section class="section"><div class="wrap rich-layout"><div><span class="section-kicker">THE RIGHT APPROACH</span><h2>What this service can do for your business</h2></div><div><p class="rich-body">${esc(category.pageDetails)}</p>${benefits.length ? `<div class="tags">${benefits.map(item=>`<span class="tag">${esc(item)}</span>`).join("")}</div>` : ""}</div></div></section>` : benefits.length ? `<section class="section"><div class="wrap"><div class="section-head"><div><span class="section-kicker">WHY THIS SERVICE</span><h2>What you can expect</h2></div></div><div class="tags">${benefits.map(item=>`<span class="tag">${esc(item)}</span>`).join("")}</div></div></section>` : "";
   const html = [
     hero,
+    detailSection,
     renderServiceGrid({kicker:"WHAT WE OFFER",title:`Our ${name} services`,subtitle:"Explore the ways we can help you plan, build and improve.",anchor:"category-services"},categoryId),
-    featureSection ? renderFeatures({...featureSection,anchor:"category-approach"}) : "",
-    processSection ? renderProcess({...processSection,anchor:"category-process"}) : "",
+    featureSection ? renderFeatures({...featureSection,anchor:"category-approach"},categoryId) : "",
+    processSection ? renderProcess({...processSection,anchor:"category-process"},categoryId) : "",
     renderPortfolio({kicker:"RELEVANT WORK",title:`Our work in ${name}`,subtitle:"Examples and concepts related to this service.",anchor:"category-work"},categoryId),
     renderFaq({kicker:"QUESTIONS, ANSWERED",title:`About ${name}`,subtitle:"Answers to help you understand the service and the next step.",anchor:"category-faq"},categoryId),
     renderContact({anchor:"contact",kicker:"READY TO GET STARTED?",title:`Let's discuss your ${name.toLowerCase()} project.`,subtitle:"Tell us what you are trying to achieve and we will help shape the right next step."})
