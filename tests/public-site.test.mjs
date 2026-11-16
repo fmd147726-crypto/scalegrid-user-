@@ -6,6 +6,12 @@ const app = readFileSync(new URL("../app.js", import.meta.url), "utf8");
 const config = readFileSync(new URL("../firebase-config.js", import.meta.url), "utf8");
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 
+test("public HTML metadata contains real line breaks, not escaped text", () => {
+  assert.doesNotMatch(html, /\\\\n/);
+  assert.match(html, /<meta property="og:image"/);
+  assert.match(html, /<link rel="canonical"/);
+});
+
 test("public website reads published content, not private working content", () => {
   assert.match(app, /ref\(db,\s*"publicContent"\)/);
   assert.doesNotMatch(app, /ref\(db,\s*"siteContent"\)/);
