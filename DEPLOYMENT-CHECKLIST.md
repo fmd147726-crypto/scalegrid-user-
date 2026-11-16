@@ -1,7 +1,7 @@
 # Deployment checklist
 
 ## Repositories
-- User: `ScaleGrid-User-Site`
+- User: `scalegrid-user-`
 - Admin: `ScaleGrid-Admin-Panel`
 
 Expected GitHub Pages URLs:
