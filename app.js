@@ -340,6 +340,10 @@ function renderPage(slug) {
   if (slug === "home") {
     // Keep the homepage focused: introduction, service discovery and a direct contact path.
     sections = sections.filter(([,section]) => ["hero","serviceGrid","contact"].includes(section.type));
+    sections = sections.map(([id,section]) => {
+      const isStarterHero = section.type === "hero" && /discuss your project/i.test(section.primaryLabel || "") && /explore services/i.test(section.secondaryLabel || "");
+      return [id,isStarterHero ? {...section,primaryLabel:"Explore Services",primaryHref:"#services",secondaryLabel:"Contact Us",secondaryHref:"#contact"} : section];
+    });
   }
   if (!sections.length) {
     main.innerHTML = `<section class="page-empty wrap"><span class="section-kicker">${esc(page.title || "PAGE")}</span><h1>Content is being prepared.</h1><p>This page has no published sections yet. You can add them in the Admin Panel.</p></section>`;
