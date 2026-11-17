@@ -25,3 +25,16 @@ test("public Pages URL matches the connected user-site repository", () => {
   assert.match(config, /https:\/\/fmd147726-crypto\.github\.io\/scalegrid-user-\//);
   assert.match(html, /<script type="module" src="app\.js"><\/script>/);
 });
+
+
+test("homepage includes its saved portfolio, approach, about, process and FAQ sections", () => {
+  assert.match(app, /sections = sections\.map\(\(\[id,section\]\) => \{/);
+  assert.doesNotMatch(app, /sections = sections\.filter\(\(\[,section\]\) => \["hero","serviceGrid","contact"\]/);
+  assert.match(app, /renderPortfolio\(section\)/);
+  assert.match(app, /renderFaq\(section\)/);
+});
+
+test("service pages display FAQs only when the service is explicitly assigned", () => {
+  assert.match(app, /isFaqAssignedToService\(item,serviceCategoryId\)/);
+  assert.match(app, /isFaqVisibleOnHome\(item\)/);
+});
