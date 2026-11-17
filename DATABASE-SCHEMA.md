@@ -20,6 +20,8 @@
 
 Content records may have `enabled`, `status` (`draft`, `published`, `archived`), and `order`. Existing records without `status` remain publishable when enabled for compatibility.
 
+FAQ records may include `serviceCategoryIds` (an array of service-category IDs) and `showOnHome` (a boolean). A question appears on a service page only when that page ID is assigned. It appears in the homepage FAQ section unless `showOnHome` is `false`. Existing single-value `serviceCategoryId` records are normalized to the array format during publishing for backwards compatibility.
+
 ## Public projection
 `publicContent` is the only new content path read by the public website. It is created by the Admin Panel's Publish action. Draft, archived, hidden, disabled-category, unpublished-page, and unpublished-section records are omitted. Settings are allowlisted before projection so unknown private settings are not copied.
 

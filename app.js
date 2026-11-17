@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebase
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js";
 import { firebaseConfig, appCheckSiteKey, expectedSiteUrl } from "./firebase-config.js";
+import { isFaqVisibleOnHome, isFaqAssignedToService } from "./faq-utils.js";
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 if (appCheckSiteKey) initializeAppCheck(app,{provider:new ReCaptchaV3Provider(appCheckSiteKey),isTokenAutoRefreshEnabled:true});
@@ -239,11 +240,12 @@ function renderProcess(section, serviceCategoryId = "") {
 function renderFaq(section, serviceCategoryId = "") {
   const categories = siteContent.faqCategories || {};
   const serviceCategories = siteContent.serviceCategories || {};
-  const faqs = orderedEnabled(siteContent.faqs).filter(([,item]) =>
-    (!serviceCategoryId || !item.serviceCategoryId || item.serviceCategoryId === serviceCategoryId) &&
-    (!item.categoryId || categories[item.categoryId]?.enabled !== false) &&
-    (!item.serviceCategoryId || serviceCategories[item.serviceCategoryId]?.enabled !== false)
-  );
+  const faqs = orderedEnabled(siteContent.faqs).filter(([,item]) => {
+    const matchesAudience = serviceCategoryId ? isFaqAssignedToService(item,serviceCategoryId) : isFaqVisibleOnHome(item);
+    return matchesAudience &&
+      (!item.categoryId || categories[item.categoryId]?.enabled !== false) &&
+      (!serviceCategoryId || serviceCategories[serviceCategoryId]?.enabled !== false);
+  });
   const grouped = new Map();
   faqs.forEach(([,item]) => {
     const categoryId = item.categoryId || "";
@@ -366,8 +368,8 @@ function renderPage(slug) {
   }
   let sections = entries(page.sections).filter(([,section]) => section && (section.enabled !== false || (slug === "home" && section.type === "contact"))).sort((a,b)=>(Number(a[1].order)||0)-(Number(b[1].order)||0));
   if (slug === "home") {
-    // Keep the homepage focused: introduction, service discovery and a direct contact path.
-    sections = sections.filter(([,section]) => ["hero","serviceGrid","contact"].includes(section.type));
+    // Render every enabled homepage section in its saved order. The homepage is the
+    // general introduction; service pages separately render filtered portfolio and FAQs.
     sections = sections.map(([id,section]) => {
       const isStarterHero = section.type === "hero" && /discuss your project/i.test(section.primaryLabel || "") && /explore services/i.test(section.secondaryLabel || "");
       return [id,isStarterHero ? {...section,primaryLabel:"Explore Services",primaryHref:"#services",secondaryLabel:"Contact Us",secondaryHref:"#contact"} : section];
